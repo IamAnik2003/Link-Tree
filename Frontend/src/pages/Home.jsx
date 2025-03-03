@@ -12,7 +12,7 @@ import Audiomack from "../assets/Audiomack.png";
 import Bandsintown from "../assets/Bandsintown.png";
 import Bonfire from "../assets/Bonfire.png";
 import Books from "../assets/Books.png";
-import BuyMeAgift from "../assets/BuyMeAgift.png";
+import bmg from "../assets/bmg.png";
 import Cameo from "../assets/Cameo.png";
 import Clubhouse from "../assets/Clubhouse.png";
 import Community from "../assets/Community.png";
@@ -45,7 +45,7 @@ export default function Home() {
       description: "Promote books on your Linktree",
     },
     {
-      src: BuyMeAgift,
+      src: bmg,
       title: "Buy Me A Gift",
       description: "Let visitors support you with a small gift",
     },
