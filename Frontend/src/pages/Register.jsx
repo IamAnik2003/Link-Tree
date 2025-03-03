@@ -18,6 +18,8 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
+
 
   const validate = () => {
     let newErrors = {};
@@ -84,7 +86,7 @@ export default function Register() {
 
     try {
       // Send form data to the backend
-      const response = await axios.post("/api/register", {
+      const response = await axios.post(`${VITE_BACK_URL}/api/register`, {
         firstname,
         lastname,
         email,
