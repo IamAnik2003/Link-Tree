@@ -399,7 +399,7 @@ export default function Home() {
                   our respects to Elders past, present and emerging.
                 </p>
               )}
-              <img style={!isMobile ? { width: "30%", height: "10%" } : { width: "70%", height: "10%", position: "relative", top: "9%" }} src={AutoLayoutHorizontal} alt="" />
+              <img style={!isMobile ? { width: "30%", height: "10%" } : { width: "70%", height: "10%", position: "relative", top: "9%" }} src={autoLayoutHorizontal} alt="" />
             </div>
           </div>
         </div>
