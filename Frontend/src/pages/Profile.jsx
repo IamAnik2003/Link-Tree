@@ -14,6 +14,7 @@ import special1 from "../assets/special1.png";
 import special2 from "../assets/special2.png";
 
 export default function Profile({ VITE_URL }) {
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
   const navigate = useNavigate();
   const { userID } = useParams();
   const [userData, setUserData] = useState(null);
@@ -45,7 +46,7 @@ export default function Profile({ VITE_URL }) {
 
   const getData = async () => {
     try {
-      const response = await axios.get(`/api/getUserProfile/${userID}`);
+      const response = await axios.get(`${VITE_BACK_URL}/api/getUserProfile/${userID}`);
       if (response.status === 200) {
         setUserData(response.data);
       }
@@ -59,7 +60,7 @@ export default function Profile({ VITE_URL }) {
 
   const fetchClickCounts = async () => {
     try {
-      const response = await axios.get("/api/getCounts", {
+      const response = await axios.get(`${VITE_BACK_URL}/api/getCounts`, {
         params: { email: userData?.email },
       });
       if (response.status === 200) {
@@ -81,7 +82,7 @@ export default function Profile({ VITE_URL }) {
 
   const fetchClickDetails = async () => {
     try {
-      const response = await axios.get(`/api/getClickDetails/${userID}`);
+      const response = await axios.get(`${VITE_BACK_URL}/api/getClickDetails/${userID}`);
       if (response.status === 200) {
         setClickDetails(response.data.clicks);
       }
@@ -139,7 +140,7 @@ export default function Profile({ VITE_URL }) {
     });
 
     try {
-      const response = await axios.post("/api/setCounts", {
+      const response = await axios.post(`${VITE_BACK_URL}/api/setCounts`, {
         userID,
         type,
         app,
