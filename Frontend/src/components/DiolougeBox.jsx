@@ -24,6 +24,7 @@ export default function DiolougeBox({
   const [selectedApp, setSelectedApp] = useState("");
   const [isToggleOn, setIsToggleOn] = useState(false);
   const isMobile = useIsMobile();
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const handleDialogClick = (e) => e.stopPropagation();
 
@@ -87,7 +88,7 @@ export default function DiolougeBox({
 
     try {
       // Save the updated arrays to the backend
-      const response = await axios.patch("/api/profileSave", {
+      const response = await axios.patch(`${VITE_BACK_URL}/api/profileSave`, {
         savedAddLinks: updatedAddLinks,
         savedShopLinks: updatedShopLinks,
         email,
