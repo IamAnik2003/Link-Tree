@@ -468,7 +468,9 @@ export default function Profile({ VITE_URL }) {
                     ? styles["link-item-div"]
                     : selectedLayout === "grid"
                     ? styles["link-item-div-grid"]
-                    : styles["link-item-div-carousel"]
+                    : selectedLayout === "carousel"
+                    ? styles["link-item-div-carousel"]
+                    : styles["link-item-div"] 
                 }
                 style={{
                   textDecoration: "none",
