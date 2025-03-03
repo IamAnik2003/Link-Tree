@@ -32,6 +32,7 @@ export default function AppearanceComponent({
   const [preview, setPreview] = useState(false);
   const isMobile= useIsMobile();
   const email =localStorage.getItem("email");
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const handleLayoutSelection = (layout) => {
     setSelectedLayout(layout);
@@ -65,7 +66,7 @@ export default function AppearanceComponent({
   const handleSaveButton = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post("/api/saveappsettings", {
+      const response = await axios.post(`${VITE_BACK_URL}/api/saveappsettings`, {
         email,
         selectedLayout,
         selectedButtonStyle,
