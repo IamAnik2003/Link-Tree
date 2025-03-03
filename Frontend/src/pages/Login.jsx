@@ -14,6 +14,7 @@ export default function Login() {
   const [errors, setErrors] = useState({}); // State to hold validation errors
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   // Validation function
   const validate = () => {
@@ -46,7 +47,7 @@ export default function Login() {
     }
 
     try {
-      const response = await axios.post("/api/login", {
+      const response = await axios.post(`${VITE_BACK_URL}/api/login`, {
         email: email,
         password: password,
       });
