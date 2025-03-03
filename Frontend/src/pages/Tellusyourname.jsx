@@ -13,6 +13,7 @@ export default function Tellusyourname() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const email = localStorage.getItem("email");
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const categories = [
     { emoji: "🏢", name: "Business" },
@@ -49,7 +50,7 @@ export default function Tellusyourname() {
 
     // If validation passes, save the data (you can replace this with your logic)
     try {
-      const response = await axios.post("/api/tell-us-yourname", {
+      const response = await axios.post(`${VITE_BACK_URL}/api/tell-us-yourname`, {
         username: username,
         category: selectedCategory,
         email: email,
