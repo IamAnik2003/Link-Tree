@@ -15,6 +15,7 @@ import cross2 from "../assets/cross2.png";
 import Phone from "./Phone";
 import useIsMobile from "./useIsMobile";
 
+
 export default function LinkComponent({
   selectedColor,
   setSelectedColor,
@@ -46,7 +47,7 @@ export default function LinkComponent({
   const [preview, setPreview] = useState(false);
   const isMobile = useIsMobile();
   const [file, setFile] = useState();
-  const [tempProfileImage, setTempProfileImage] = useState(null); // Temporary image state
+  const [tempProfileImage, setTempProfileImage] = useState(null); // ✅ keep modified version
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const handleSaveButton = async (e) => {
