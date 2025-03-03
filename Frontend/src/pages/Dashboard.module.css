@@ -205,21 +205,24 @@
   
   }
     .dashboard-container {
-      overflow-x: hidden;
+      overflow: hidden;
       display: flex;
      flex-direction: column;
       width: 99vw;
       height: 99vh;
       font-family: Poppins;
+      padding: 1%;
     }
     .ch2{
       overflow-x: hidden;
+      height: 70em;
       max-height: 70em;
       padding: 3%;
     }
     .ch1{
       width: 100%;
-      min-height: 10%;
+      height: 25%;
+  
       display: flex;
       flex-direction: row;
       
