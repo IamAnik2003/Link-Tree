@@ -30,6 +30,7 @@ ChartJS.register(
 );
 
 export default function AnalyticsComponent() {
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [analyticsData, setAnalyticsData] = useState({
@@ -50,7 +51,7 @@ export default function AnalyticsComponent() {
   useEffect(() => {
     const getCounts = async () => {
       try {
-        const res = await axios.get("/api/getCounts", { params: { email } });
+        const res = await axios.get(`${VITE_BACK_URL}/api/getCounts`, { params: { email } });
         if (res.status === 200) {
           setAnalyticsData(res.data);
         }
@@ -61,7 +62,7 @@ export default function AnalyticsComponent() {
 
     const fetchClickDetails = async () => {
       try {
-        const response = await axios.get("/api/getClickDetails", { params: { email } });
+        const response = await axios.get(`${VITE_BACK_URL}/api/getClickDetails`, { params: { email } });
         if (response.status === 200) {
           setClickDetails(response.data.clicks);
         }
