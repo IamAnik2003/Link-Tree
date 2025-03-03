@@ -46,13 +46,14 @@ export default function LinkComponent({
   const [preview, setPreview] = useState(false);
   const isMobile = useIsMobile();
   const [file, setFile] = useState();
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const handleSaveButton = async (e) => {
     e.preventDefault();
 
     try {
       // First API call: Save profile data
-      const profileResponse = await axios.post("/api/profileSave", {
+      const profileResponse = await axios.post(`${VITE_BACK_URL}/api/profileSave`, {
         bio,
         username,
         email,
@@ -91,7 +92,7 @@ export default function LinkComponent({
           localStorage.setItem("profileImage", imageURL);
 
           // Save the imageURL to the backend
-          const updateImageResponse = await axios.patch("/api/updateProfileImage", {
+          const updateImageResponse = await axios.patch(`${VITE_BACK_URL}/api/updateProfileImage`, {
             email,
             imageURL,
           });
@@ -134,7 +135,7 @@ export default function LinkComponent({
       setSavedShopLinks(updatedShopLinks);
 
       // Save the updated links to the backend
-      const response = await axios.patch("/api/profileSave", {
+      const response = await axios.patch(`${VITE_BACK_URL}/api/profileSave`, {
         savedAddLinks: updatedAddLinks,
         savedShopLinks: updatedShopLinks,
         email,
@@ -161,7 +162,7 @@ export default function LinkComponent({
   const handleRemoveImage = async () => {
     try {
       // Remove the profile image from the backend
-      const response = await axios.patch("/api/removeProfileImage", { email });
+      const response = await axios.patch(`${VITE_BACK_URL}/api/removeProfileImage`, { email });
 
       if (response.status === 200) {
         // Update state and localStorage
