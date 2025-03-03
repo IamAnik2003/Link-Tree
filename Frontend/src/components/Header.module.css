@@ -1,0 +1,29 @@
+
+.head-container {
+    width: 100%;
+    margin-top: 1%;
+    margin-left: 1%;
+    padding: 1%;
+    height: 12vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Poppins;
+}
+.head-container p{
+    font-size: 0.95em;
+    
+
+}
+.share-container {
+    display: flex;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 7%;
+    height: 5%;
+    justify-content: center;
+    align-items: center;
+    border-radius: 25px;
+    column-gap: 7%;
+    position: absolute;
+    top: 8%;
+    left: 90%;
+}
