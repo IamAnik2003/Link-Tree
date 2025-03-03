@@ -8,16 +8,16 @@ import img2 from "../assets/div (1).png";
 import img4 from "../assets/div (2).png";
 import img3 from "../assets/square02.webp.png";
 import icon from "../assets/icon.png";
-import Audiomack from "../assets/Audiomack.png";
-import Bandsintown from "../assets/Bandsintown.png";
-import Bonfire from "../assets/Bonfire.png";
-import Books from "../assets/Books.png";
+import audiomack from "../assets/Audiomack.png";
+import bandsintown from "../assets/Bandsintown.png";
+import bonfire from "../assets/Bonfire.png";
+import books from "../assets/Books.png";
 import bmg from "../assets/bmg.png";
-import Cameo from "../assets/Cameo.png";
-import Clubhouse from "../assets/Clubhouse.png";
-import Community from "../assets/Community.png";
-import ContactDetails from "../assets/ContactDetails.png";
-import AutoLayoutHorizontal from "../assets/Auto Layout Horizontal.png";
+import cameo from "../assets/Cameo.png";
+import clubhouse from "../assets/Clubhouse.png";
+import community from "../assets/Community.png";
+import contactDetails from "../assets/ContactDetails.png";
+import autoLayoutHorizontal from "../assets/Auto Layout Horizontal.png";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -25,22 +25,22 @@ export default function Home() {
   const isMobile = useIsMobile();
   const platformsData = [
     {
-      src: Audiomack,
+      src: audiomack,
       title: "Audiomack",
       description: "Add an Audiomack player to your Linktree",
     },
     {
-      src: Bandsintown,
+      src: bandsintown,
       title: "Bandsintown",
       description: "Drive ticket sales by listing your events",
     },
     {
-      src: Bonfire,
+      src: bonfire,
       title: "Bonfire",
       description: "Display and sell your custom merch",
     },
     {
-      src: Books,
+      src: books,
       title: "Books",
       description: "Promote books on your Linktree",
     },
@@ -50,22 +50,22 @@ export default function Home() {
       description: "Let visitors support you with a small gift",
     },
     {
-      src: Cameo,
+      src: cameo,
       title: "Cameo",
       description: "Make impossible fan connections possible",
     },
     {
-      src: Clubhouse,
+      src: clubhouse,
       title: "Clubhouse",
       description: "Let your community in on the conversation",
     },
     {
-      src: Community,
+      src: community,
       title: "Community",
       description: "Build an SMS subscriber list",
     },
     {
-      src: ContactDetails,
+      src: contactDetails,
       title: "Contact Details",
       description: "Easily share downloadable contact details",
     },
