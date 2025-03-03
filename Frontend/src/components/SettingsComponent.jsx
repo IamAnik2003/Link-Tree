@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function SettingsComponent() {
+  const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
   const navigate = useNavigate();
   // State for form inputs
   const email = localStorage.getItem("email");
@@ -13,6 +14,7 @@ export default function SettingsComponent() {
   const [newEmail, setNewEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
 
   // State for validation errors
   const [errors, setErrors] = useState({});
@@ -74,7 +76,7 @@ export default function SettingsComponent() {
 
     // Optionally, save the data to localStorage or send it to a backend API
     try {
-      const response = await axios.patch("/api/updateprofile", {
+      const response = await axios.patch(`${VITE_BACK_URL}/api/updateprofile`, {
         firstname,
         lastname,
         password,
