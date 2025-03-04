@@ -313,8 +313,8 @@
 /* Media Query for Smaller Screens */
 @media (max-width: 426px) {
   .phone-container {
-    width: 100%; /* Make the container full width on small screens */
-    height: 100%; /* Allow height to adjust based on content */
+    width: 100dvw; /* Make the container full width on small screens */
+    height: 100dvh; /* Allow height to adjust based on content */
     border: none;
   }
 
