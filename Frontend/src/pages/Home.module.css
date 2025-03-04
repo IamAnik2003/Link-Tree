@@ -257,7 +257,7 @@
 @media (max-width: 456px) {
     .home{
         padding: 3%;
-        width: 100dvw;
+        width: 100vw;
         height: auto;
         overflow-x: hidden;
         overflow-y: auto;
