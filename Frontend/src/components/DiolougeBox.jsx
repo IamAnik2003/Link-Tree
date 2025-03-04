@@ -62,12 +62,6 @@ export default function DiolougeBox({
       return;
     }
 
-    // Icon selection is optional for AddLinks (isLink === true)
-    if (!isLink && !selectedApp) {
-      toast.error("Please select an application.");
-      return;
-    }
-
     // Set the default image if no icon is selected
     const appIcon = selectedApp || linkpng;
 
@@ -181,6 +175,7 @@ export default function DiolougeBox({
           </div>
         </div>
 
+        {/* Conditionally render application selection only for links */}
         {isLink && (
           <div className={styles["application"]}>
             <h3>Applications</h3>
