@@ -7,8 +7,8 @@
 
 .container {
     display: flex;
-    height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100dvw;
     font-family: "Poppins", serif;
 }
 
@@ -149,8 +149,8 @@
 @media (max-width: 456px) {
     .container {
         display: flex;
-        height: 100vh;
-        width: 100vw;
+        height: 100dvh;
+        width: 100dvw;
         padding: 2%;
     }
 
