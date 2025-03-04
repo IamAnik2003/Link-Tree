@@ -33,6 +33,7 @@ export default function Profile({ VITE_URL }) {
     otherClicks: 0,
   });
 
+  // Function to detect the platform using the User-Agent string
   const getPlatform = () => {
     const userAgent = navigator.userAgent;
     if (userAgent.includes("Win")) return "Windows";
@@ -41,6 +42,16 @@ export default function Profile({ VITE_URL }) {
     else if (userAgent.includes("Android")) return "Android";
     else if (userAgent.includes("iPhone") || userAgent.includes("iPad"))
       return "iOS";
+    else return "Unknown";
+  };
+
+  // Function to detect the browser using the User-Agent string
+  const getBrowser = () => {
+    const userAgent = navigator.userAgent;
+    if (userAgent.includes("Firefox")) return "Firefox";
+    else if (userAgent.includes("Edg")) return "Edge";
+    else if (userAgent.includes("Chrome")) return "Chrome";
+    else if (userAgent.includes("Safari")) return "Safari";
     else return "Unknown";
   };
 
@@ -103,7 +114,8 @@ export default function Profile({ VITE_URL }) {
   }, [userData]);
 
   const updateClickCount = async (type, app = null, url = null, linkId = null) => {
-    const platform = getPlatform();
+    const platform = getPlatform(); // Get the platform (e.g., Android, iOS, Windows)
+    const browser = getBrowser(); // Get the browser (e.g., Chrome, Firefox)
 
     setClickCounts((prev) => {
       const newCounts = { ...prev };
@@ -145,6 +157,7 @@ export default function Profile({ VITE_URL }) {
         type,
         app,
         platform,
+        browser,
         url,
         linkId,
       });
