@@ -179,12 +179,10 @@
     }
 }
   @media (max-width: 456px) {
-    body{
-      overflow:hidden;
-    }
+   
     .head-container1{
       width: 100%;
-      height: 7vh;
+      height: 7dvh;
       display: flex;
       justify-content: space-between;margin-top: 2%;
   }
