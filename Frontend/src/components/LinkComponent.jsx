@@ -46,6 +46,7 @@ export default function LinkComponent({
   const [preview, setPreview] = useState(false);
   const isMobile = useIsMobile();
   const [file, setFile] = useState();
+  const [tempProfileImage, setTempProfileImage] = useState(null); // Temporary image state
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const handleSaveButton = async (e) => {
@@ -99,6 +100,7 @@ export default function LinkComponent({
 
           if (updateImageResponse.status === 200) {
             toast.success("Profile picture uploaded and saved successfully!");
+            setTempProfileImage(null); // Reset the temporary image after saving
           }
         } catch (uploadError) {
           console.error("Upload Error:", uploadError.message);
@@ -155,7 +157,9 @@ export default function LinkComponent({
   const handleOnchange = (e) => {
     if (e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      setFile(selectedFile); // Update state
+      setFile(selectedFile); // Update file state
+      const tempImageURL = URL.createObjectURL(selectedFile); // Create a temporary URL
+      setTempProfileImage(tempImageURL); // Update temporary image state
     }
   };
 
@@ -167,6 +171,7 @@ export default function LinkComponent({
       if (response.status === 200) {
         // Update state and localStorage
         setProfileImage(null);
+        setTempProfileImage(null); // Reset the temporary image
         localStorage.removeItem("profileImage");
         toast.success("Profile image removed successfully!");
       }
@@ -201,7 +206,7 @@ export default function LinkComponent({
             savedAddLinks={savedAddLinks}
             savedShopLinks={savedShopLinks}
             isLink={isLink}
-            profileImage={profileImage}
+            profileImage={tempProfileImage || profileImage} // Use temporary image if available
             selectedLayout={selectedLayout}
             selectedButtonStyle={selectedButtonStyle}
             buttonColor={buttonColor}
@@ -219,7 +224,7 @@ export default function LinkComponent({
             savedAddLinks={savedAddLinks}
             savedShopLinks={savedShopLinks}
             isLink={isLink}
-            profileImage={profileImage}
+            profileImage={tempProfileImage || profileImage} // Use temporary image if available
             selectedLayout={selectedLayout}
             selectedButtonStyle={selectedButtonStyle}
             buttonColor={buttonColor}
@@ -288,7 +293,7 @@ export default function LinkComponent({
               Remove
             </button>
             <div className={styles["profile-pic"]}>
-              <img src={profileImage || avater} alt="Profile" />
+              <img src={tempProfileImage || profileImage || avater} alt="Profile" />
             </div>
             <div className={styles["profile-title"]}>
               <p>Profile title</p>
@@ -391,7 +396,7 @@ export default function LinkComponent({
           <div className={styles["banner-container"]}>
             <div className={styles["banner"]} style={{ backgroundColor: selectedColor }}>
               <div className={styles["profile-on-banner"]}>
-                <img src={profileImage || avater} alt="Profile" />
+                <img src={tempProfileImage || profileImage || avater} alt="Profile" />
               </div>
               <h3>@{username}</h3>
               <p>
