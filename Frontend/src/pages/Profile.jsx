@@ -38,10 +38,10 @@ export default function Profile({ VITE_URL }) {
     const userAgent = navigator.userAgent;
     if (userAgent.includes("Win")) return "Windows";
     else if (userAgent.includes("Mac")) return "Mac";
-    else if (userAgent.includes("Linux")) return "Linux";
     else if (userAgent.includes("Android")) return "Android";
     else if (userAgent.includes("iPhone") || userAgent.includes("iPad"))
       return "iOS";
+      else if (userAgent.includes("Linux")) return "Linux";
     else return "Unknown";
   };
 
