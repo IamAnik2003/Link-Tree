@@ -185,7 +185,7 @@
   @media (max-width: 456px) {
     .head-container1{
       width: 100%;
-      height: 7vh;
+      height: 9dvh;
       display: flex;
       justify-content: space-between;
       margin-top: 1%;
@@ -194,6 +194,8 @@
       padding:1%;
       box-shadow: rgba(0, 0, 0, 0.501) 0px 2px 10px;
       border-radius: 25px;
+      flex: 1;
+      aspect-ratio: 1/1;
   }
   .head-container1 img{
       width: 120px;

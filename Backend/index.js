@@ -300,6 +300,31 @@ app.patch("/api/updateProfileImage", async (req, res) => {
     res.status(500).json({ message: "Failed to update profile image" });
   }
 });
+// New route: matches frontend calls like /api/getProfile?email=...
+app.get("/api/getProfile", async (req, res) => {
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      username: user.username,
+      bio: user.bio,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      selectedColor: user.selectedColor,
+      profileImage: user.profileImage || null, // include profile image
+    });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ message: "An error occurred while fetching profile data." });
+  }
+});
+
 app.patch("/api/removeProfileImage", async (req, res) => {
   const { email } = req.body;
 

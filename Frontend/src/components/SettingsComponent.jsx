@@ -189,7 +189,7 @@ export default function SettingsComponent() {
                     top: "0dvh",
                     right: "76dvw",
                   }
-                : { width: "150px", padding: "1%" }
+                : { width: "150px", padding: "1%",position:"relative",right:"10dvw" }
             }
           >
             <p>Save Changes</p>
