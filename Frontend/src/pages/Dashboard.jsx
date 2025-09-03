@@ -14,6 +14,8 @@ import AnalyticsComponent from "../components/AnalyticsComponent";
 import SettingsComponent from "../components/SettingsComponent";
 import Header from "../components/Header";
 import useIsMobile from "../components/useIsMobile";
+  import { useEffect } from "react";
+import axios from "axios";
 
 export default function Dashboard({ VITE_URL }) {
   const fullname = localStorage.getItem("fullname");
@@ -42,6 +44,35 @@ export default function Dashboard({ VITE_URL }) {
   const [selectedColor, setSelectedColor] = useState(
     localStorage.getItem("selectedColor") || "#342B26"
   );
+
+
+
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const email = localStorage.getItem("email");
+      if (!email) return;
+
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BACK_URL}/api/getProfile`,
+        { params: { email } }
+      );
+
+      // unify key: API might return `profileImage` or `imageURL`
+      const urlFromApi = data?.profileImage || data?.imageURL || null;
+
+      if (urlFromApi) {
+        setProfileImage(urlFromApi);
+        localStorage.setItem("profileImage", urlFromApi);
+      }
+    } catch (err) {
+      console.error("Failed to fetch profile:", err);
+    }
+  };
+
+  fetchProfile();
+}, []);
+
 
   // Handle sign-out logic
   const handleSignOut = () => {

@@ -2,17 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import share1 from "../assets/share1.png";
-import youtube from "../assets/youtube.png";
-import instagram from "../assets/instagram.png";
-import facebook from "../assets/facebook.png";
-import twitter from "../assets/twitter.png";
 import fire from "../assets/fire.png";
 import styles from "../pages/Profile.module.css";
 import avater from "../assets/avater.png";
 import shop from "../assets/pngwing.com (1).png";
 import special1 from "../assets/special1.png";
 import special2 from "../assets/special2.png";
-import linkpng from "../assets/pngwing.com (2).png";
+
+// ✅ Import react-icons (same as Phone.jsx)
+import {
+  FaFacebook,
+  FaInstagram,
+  FaTwitter,
+  FaYoutube,
+  FaWhatsapp,
+  FaGithub,
+  FaLinkedin,
+  FaLink,
+} from "react-icons/fa";
 
 export default function Profile({ VITE_URL }) {
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
@@ -43,7 +50,7 @@ export default function Profile({ VITE_URL }) {
     else if (userAgent.includes("Android")) return "Android";
     else if (userAgent.includes("iPhone") || userAgent.includes("iPad"))
       return "iOS";
-      else if (userAgent.includes("Linux")) return "Linux";
+    else if (userAgent.includes("Linux")) return "Linux";
     else return "Unknown";
   };
 
@@ -55,6 +62,29 @@ export default function Profile({ VITE_URL }) {
     else if (userAgent.includes("Chrome")) return "Chrome";
     else if (userAgent.includes("Safari")) return "Safari";
     else return "Unknown";
+  };
+
+  // ✅ Function to get the correct icon based on the selected app (same as Phone.jsx)
+  const getIcon = (app) => {
+    switch (app?.toLowerCase()) {
+      case "youtube":
+        return <FaYoutube size={45} color="red" />;
+      case "instagram":
+        return <FaInstagram size={45} color="#E1306C" />;
+      case "facebook":
+        return <FaFacebook size={45} color="#1877F2" />;
+      case "twitter":
+      case "x":
+        return <FaTwitter size={45} color="#1DA1F2" />;
+      case "whatsapp":
+        return <FaWhatsapp size={45} color="#25D366" />;
+      case "github":
+        return <FaGithub size={45} color="black" />;
+      case "linkedin":
+        return <FaLinkedin size={45} color="#0077B5" />;
+      default:
+        return <FaLink size={45} color="#555" />;
+    }
   };
 
   // Function to crop and resize image to a perfect circle
@@ -80,8 +110,8 @@ export default function Profile({ VITE_URL }) {
         
         // Set canvas dimensions (square for circle)
         const size = Math.min(img.width, img.height);
-        canvas.width = 150; // Output size
-        canvas.height = 150; // Output size
+        canvas.width = 150;
+        canvas.height = 150;
         
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -190,8 +220,8 @@ export default function Profile({ VITE_URL }) {
   }, [userData]);
 
   const updateClickCount = async (type, app = null, url = null, linkId = null) => {
-    const platform = getPlatform(); // Get the platform (e.g., Android, iOS, Windows)
-    const browser = getBrowser(); // Get the browser (e.g., Chrome, Firefox)
+    const platform = getPlatform();
+    const browser = getBrowser();
 
     setClickCounts((prev) => {
       const newCounts = { ...prev };
@@ -267,21 +297,6 @@ export default function Profile({ VITE_URL }) {
     buttonFontColor,
     selectedFont,
   } = userData;
-
-  const getIcon = (app) => {
-    switch (app) {
-      case "youtube":
-        return youtube;
-      case "instagram":
-        return instagram;
-      case "facebook":
-        return facebook;
-      case "twitter":
-        return twitter;
-      default:
-        return linkpng;
-    }
-  };
 
   const handleShare = () => {
     const shareLink = `${VITE_URL}/profile/${userID}`;
@@ -534,74 +549,78 @@ export default function Profile({ VITE_URL }) {
           </button>
         </div>
 
-        <div
-          className={getLayoutClass()}
-          style={{ backgroundColor: getThemeStyle().backgroundColor }}
-        >
-          {Array.isArray(isLink ? savedAddLinks : savedShopLinks) &&
-          (isLink ? savedAddLinks : savedShopLinks).length > 0 ? (
-            (isLink ? savedAddLinks : savedShopLinks).map((item, index) => (
-              <a
-                key={index}
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) =>
-                  handleItemClick(
-                    isLink ? "link" : "shop",
-                    item.app,
-                    item.url,
-                    item._id,
-                    e
-                  )
-                }
-                className={
-                  selectedLayout === "stack"
-                    ? styles["link-item-div"]
-                    : selectedLayout === "grid"
-                    ? styles["link-item-div-grid"]
-                    : selectedLayout === "carousel"
-                    ? styles["link-item-div-carousel"]
-                    : styles["link-item-div"] 
-                }
-                style={{
-                  textDecoration: "none",
-                  color: "inherit",
-                  ...getInnerDivStyle(),
-                  ...getCombinedStyles(),
-                }}
-              >
-                <div
-                  className={
-                    selectedLayout === "grid"
-                      ? styles["icon-link-grid"]
-                      : selectedLayout === "carousel"
-                      ? styles["icon-link-carousel"]
-                      : styles["icon-link"]
+        {/* Links Container - This is the key fix for scrolling */}
+        <div className={styles["links-container"]}>
+          <div
+            className={getLayoutClass()}
+            style={{ backgroundColor: getThemeStyle().backgroundColor }}
+          >
+            {Array.isArray(isLink ? savedAddLinks : savedShopLinks) &&
+            (isLink ? savedAddLinks : savedShopLinks).length > 0 ? (
+              (isLink ? savedAddLinks : savedShopLinks).map((item, index) => (
+                <a
+                  key={index}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) =>
+                    handleItemClick(
+                      isLink ? "link" : "shop",
+                      item.app,
+                      item.url,
+                      item._id,
+                      e
+                    )
                   }
-                >
-                  <img
-                    src={isLink ? getIcon(item.app) : item.image || shop}
-                    alt={isLink ? item.app : "Shop"}
-                  />
-                </div>
-                <div
                   className={
                     selectedLayout === "stack"
-                      ? styles["link-text"]
+                      ? styles["link-item-div"]
                       : selectedLayout === "grid"
-                      ? styles["link-text-grid"]
-                      : styles["link-text"]
+                      ? styles["link-item-div-grid"]
+                      : selectedLayout === "carousel"
+                      ? styles["link-item-div-carousel"]
+                      : styles["link-item-div"] 
                   }
-                  style={{ color: buttonFontColor || "inherit" }}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    ...getInnerDivStyle(),
+                    ...getCombinedStyles(),
+                  }}
                 >
-                  <p>{item.title}</p>
-                </div>
-              </a>
-            ))
-          ) : (
-            <p className={styles["no-links"]}>No links available</p>
-          )}
+                  <div
+                    className={
+                      selectedLayout === "grid"
+                        ? styles["icon-link-grid"]
+                        : selectedLayout === "carousel"
+                        ? styles["icon-link-carousel"]
+                        : styles["icon-link"]
+                    }
+                  >
+                    {isLink ? (
+                      getIcon(item.app) // ✅ React Icon (same as Phone.jsx)
+                    ) : (
+                      <img src={item.image || shop} alt="Shop" /> // ✅ Shop fallback
+                    )}
+                  </div>
+                  <div
+                    className={
+                      selectedLayout === "stack"
+                        ? styles["link-text"]
+                        : selectedLayout === "grid"
+                        ? styles["link-text-grid"]
+                        : styles["link-text"]
+                    }
+                    style={{ color: buttonFontColor || "inherit" }}
+                  >
+                    <p>{item.title}</p>
+                  </div>
+                </a>
+              ))
+            ) : (
+              <p className={styles["no-links"]}>No {isLink ? "links" : "shop items"} available</p>
+            )}
+          </div>
         </div>
 
         <button
