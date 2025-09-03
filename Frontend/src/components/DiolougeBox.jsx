@@ -2,14 +2,20 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import useIsMobile from "./useIsMobile";
 import styles from "../components/DiolougeBox.module.css"; // Import CSS Module
-import twitter from "../assets/twitter.png";
-import facebook from "../assets/facebook.png";
-import instagram from "../assets/instagram.png";
-import youtube from "../assets/youtube.png";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaTwitter,
+  FaYoutube,
+  FaWhatsapp,
+  FaGithub,
+  FaLinkedin,
+  FaLink,
+} from "react-icons/fa";
+
 import copy from "../assets/copy.png";
 import remove from "../assets/delete.png";
 import axios from "axios";
-import linkpng from "../assets/pngwing.com (2).png";
 
 export default function DiolougeBox({
   onClose,
@@ -59,6 +65,12 @@ export default function DiolougeBox({
 
     if (!isValidUrl(linkUrl)) {
       toast.error("Please enter a valid URL.");
+      return;
+    }
+
+    // Icon selection is optional for AddLinks (isLink === true)
+    if (!isLink && !selectedApp) {
+      toast.error("Please select an application.");
       return;
     }
 
@@ -135,6 +147,22 @@ export default function DiolougeBox({
     toast.success("URL removed.");
   };
 
+  // Map app names to icons
+  const iconMapper = {
+    facebook: <FaFacebook color="#1877F2" size={28} />,
+    instagram: <FaInstagram color="#E4405F" size={28} />,
+    twitter: <FaTwitter color="#1DA1F2" size={28} />,
+    youtube: <FaYoutube color="#FF0000" size={28} />,
+    whatsapp: <FaWhatsapp color="#25D366" size={28} />,
+    github: <FaGithub color="#000000" size={28} />,
+    linkedin: <FaLinkedin color="#0A66C2" size={28} />,
+  };
+
+  const getAppIcon = (appName) => {
+    const key = appName?.toLowerCase();
+    return iconMapper[key] || <FaLink size={28} color="#666" />;
+  };
+
   return (
     <div className={styles["dialog-overlay"]} onClick={handleOverlayClick}>
       <div className={styles["diolouge"]} onClick={handleDialogClick}>
@@ -154,7 +182,9 @@ export default function DiolougeBox({
                 onChange={handleToggleChange}
                 aria-label="Toggle save link"
               />
-              <span className={`${styles["slider"]} ${styles["round"]} ${styles["slider-round"]}`}></span>
+              <span
+                className={`${styles["slider"]} ${styles["round"]} ${styles["slider-round"]}`}
+              ></span>
             </label>
           </div>
           <div className={styles["link-url-container"]}>
@@ -180,42 +210,20 @@ export default function DiolougeBox({
           <div className={styles["application"]}>
             <h3>Applications</h3>
             <div className={styles["social-media"]}>
-              <div
-                className={`${styles["icons"]} ${
-                  selectedApp === "instagram" ? styles["selected"] : ""
-                }`}
-                onClick={() => handleAppSelection("instagram")}
-                aria-label="Instagram"
-              >
-                <img src={instagram} alt="Instagram" />
-              </div>
-              <div
-                className={`${styles["icons"]} ${
-                  selectedApp === "facebook" ? styles["selected"] : ""
-                }`}
-                onClick={() => handleAppSelection("facebook")}
-                aria-label="Facebook"
-              >
-                <img src={facebook} alt="Facebook" />
-              </div>
-              <div
-                className={`${styles["icons"]} ${
-                  selectedApp === "youtube" ? styles["selected"] : ""
-                }`}
-                onClick={() => handleAppSelection("youtube")}
-                aria-label="YouTube"
-              >
-                <img src={youtube} alt="YouTube" />
-              </div>
-              <div
-                className={`${styles["icons"]} ${
-                  selectedApp === "twitter" ? styles["selected"] : ""
-                }`}
-                onClick={() => handleAppSelection("twitter")}
-                aria-label="Twitter"
-              >
-                <img src={twitter} alt="Twitter" />
-              </div>
+              {["facebook", "instagram", "twitter", "youtube", "whatsapp", "github", "linkedin"].map(
+                (app) => (
+                  <div
+                    key={app}
+                    className={`${styles["icons"]} ${
+                      selectedApp === app ? styles["selected"] : ""
+                    }`}
+                    onClick={() => handleAppSelection(app)}
+                    aria-label={app}
+                  >
+                    {getAppIcon(app)}
+                  </div>
+                )
+              )}
             </div>
           </div>
         )}

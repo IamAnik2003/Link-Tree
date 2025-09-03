@@ -20,7 +20,8 @@
   font-family: "Montserrat", sans-serif;
 }
 .phone-container {
-  width: 425px;
+width: 425px;
+
   height: 642px;
   border: 1rem solid black;
   padding: 2%;
@@ -31,13 +32,13 @@
   flex-direction: column;
   align-items: center;
   row-gap: 2%;
- 
+ overflow: hidden;
   
 }
 
 .profile-info {
-  width: 100%;
-  height: 30%;
+  width: 100dvw;
+  height: 30dvh;
   padding: 2%;
   display: flex;
   flex-direction: column;
@@ -53,8 +54,8 @@
 }
 
 .share-btn {
-  width: 10%;
-  height: 22%;
+  width: 40px;
+  height: 40px;
   z-index: 1000;
   background-color: #F6F7F5;
   border-radius: 50%;
@@ -67,23 +68,24 @@
 }
 
 .share-btn img {
-  width: 60%;
-  height: 60%;
+  width: 25px;
+  height: 25px;
 }
 
 .profile-photo {
-  width: 22%;
-  height: 40%;
+  width:80px;
+  height: 80px;
   border-radius: 50%;
   background: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  border:2px solid white;
 }
 
 .profile-photo img {
-  width: 75%;
-  height: 70%;
+  width: 100%;
+  height: 100%;
   border: none;
 }
 
@@ -118,7 +120,7 @@
 
 .link-item-div {
   width: 90%;
-  min-height: 30%; /* Prevent excessive height */
+  min-height: 25%; /* Prevent excessive height */
   display: flex;
   align-items: center;
   border-radius: 30px;
@@ -129,8 +131,8 @@
 }
 
 .icon-link {
-  width: 22%;
-  height: 100%;
+  width: 55px;
+  height: 55px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -140,8 +142,8 @@
 }
 
 .icon-link img {
-  width: 55%;
-  height: 45%;
+  width: 80%;
+  height: 80%;
 }
 
 .link-text {
@@ -187,9 +189,9 @@
 }
 
 .icon-link-grid {
-  width: 95%;
-  height: 5em;
-  border-radius: 30px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -198,8 +200,8 @@
 }
 
 .icon-link-grid img {
-  width: 35%;
-  height: 70%;
+  width: 80%;
+  height: 80%;
 }
 
 .link-text-grid {
@@ -230,7 +232,7 @@
 }
 
 .link-item-div-carousel {
-  min-width: 10em;
+  min-width: 150px;
   min-height: 30%;
   display: flex;
   flex-direction: column;
@@ -243,8 +245,8 @@
 }
 
 .icon-link-carousel {
-  width: 80%;
-  height: 50%;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -255,8 +257,8 @@
 }
 
 .icon-link-carousel img {
-  width: 55%;
-  height: 50%;
+  width: 80%;
+  height: 80%;
 }
 
 .link-text-carousel {
@@ -276,8 +278,8 @@
 }
 
 .get-connected {
-  width: 30%;
-  height: 6%;
+    width: 130px;
+    height: 50px;
   background-color: #28A263;
   color: white;
   border: none;
@@ -291,8 +293,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30%;
-  height: 6%;
+  width: 70px;
+  height: 30px;
   font-weight: bold;
   position: relative;
 }
@@ -305,10 +307,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100dvh;
+  width: 100dvw;
   background-color: #f0f0f0; /* Light gray background */
-
 }
+
+
 
 /* Media Query for Smaller Screens */
 @media (max-width: 426px) {
@@ -316,13 +320,15 @@
     width: 100dvw; /* Make the container full width on small screens */
     height: 100dvh; /* Allow height to adjust based on content */
     border: none;
+    border-radius: 0;
   }
 
   .profile-info {
-    height: 35%; /* Adjust height for smaller screens */
+    height: 35dvh; /* Adjust height for smaller screens */
     padding: 10px; /* Add some padding */
     border-radius: 0px 0px 35px 35px;
   }
+  
 
   .profile-info p {
     font-size: 1.2rem; /* Reduce font size for smaller screens */
@@ -332,8 +338,8 @@
     width: 90%; /* Adjust width for smaller screens */
   }
   .get-connected {
-    width: 34%;
-    height: 8%;
+    width: 130px;
+    height: 50px;
     background-color: #28A263;
     color: white;
     border: none;

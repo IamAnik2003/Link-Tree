@@ -12,6 +12,7 @@ import avater from "../assets/avater.png";
 import shop from "../assets/pngwing.com (1).png";
 import special1 from "../assets/special1.png";
 import special2 from "../assets/special2.png";
+import linkpng from "../assets/pngwing.com (2).png";
 
 export default function Profile({ VITE_URL }) {
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
@@ -22,6 +23,7 @@ export default function Profile({ VITE_URL }) {
   const [error, setError] = useState(null);
   const [isLink, setIsLink] = useState(true);
   const [clickDetails, setClickDetails] = useState([]);
+  const [processedProfileImage, setProcessedProfileImage] = useState(null);
 
   const [clickCounts, setClickCounts] = useState({
     linkClicks: 0,
@@ -55,11 +57,85 @@ export default function Profile({ VITE_URL }) {
     else return "Unknown";
   };
 
+  // Function to crop and resize image to a perfect circle
+  const processProfileImage = (imageUrl) => {
+    return new Promise((resolve) => {
+      // If no image URL provided, use the default avatar
+      if (!imageUrl) {
+        resolve(avater);
+        return;
+      }
+      
+      // If it's a default avatar or already processed, return as is
+      if (imageUrl === avater || imageUrl.includes('data:image')) {
+        resolve(imageUrl);
+        return;
+      }
+      
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions (square for circle)
+        const size = Math.min(img.width, img.height);
+        canvas.width = 150; // Output size
+        canvas.height = 150; // Output size
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Create circular clipping path
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        
+        // Calculate source cropping coordinates (center crop)
+        const sourceX = (img.width - size) / 2;
+        const sourceY = (img.height - size) / 2;
+        
+        // Draw image onto canvas (cropped and resized)
+        ctx.drawImage(
+          img, 
+          sourceX, 
+          sourceY, 
+          size, 
+          size, 
+          0, 
+          0, 
+          canvas.width, 
+          canvas.height
+        );
+        
+        // Convert to data URL
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        resolve(dataUrl);
+      };
+      
+      img.onerror = function() {
+        // If image fails to load, use default avatar
+        resolve(avater);
+      };
+      
+      img.src = imageUrl;
+    });
+  };
+
   const getData = async () => {
     try {
       const response = await axios.get(`${VITE_BACK_URL}/api/getUserProfile/${userID}`);
       if (response.status === 200) {
         setUserData(response.data);
+        
+        // Process the profile image
+        if (response.data.profileImage) {
+          const processedImage = await processProfileImage(response.data.profileImage);
+          setProcessedProfileImage(processedImage);
+        } else {
+          setProcessedProfileImage(avater);
+        }
       }
     } catch (error) {
       setError(error.response ? error.response.data : error.message);
@@ -190,7 +266,6 @@ export default function Profile({ VITE_URL }) {
     buttonColor,
     buttonFontColor,
     selectedFont,
-    profileImage,
   } = userData;
 
   const getIcon = (app) => {
@@ -204,7 +279,7 @@ export default function Profile({ VITE_URL }) {
       case "twitter":
         return twitter;
       default:
-        return youtube;
+        return linkpng;
     }
   };
 
@@ -423,7 +498,11 @@ export default function Profile({ VITE_URL }) {
             <img src={share1} alt="Share" />
           </button>
           <div className={styles["profile-photo"]}>
-            <img src={profileImage || avater} alt="Profile" />
+            <img 
+              src={processedProfileImage || avater} 
+              alt="Profile" 
+              style={{ borderRadius: '50%', width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           </div>
           <p className={`${styles[getFontClass()]}`}>@{username}</p>
         </div>

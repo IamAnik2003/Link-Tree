@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "../components/Analytics.module.css"; // Import CSS Module
+import styles from "../components/Analytics.module.css";
 import calender1 from "../assets/calender1.png";
 import calender2 from "../assets/calender2.png";
 import axios from "axios";
@@ -33,6 +33,7 @@ export default function AnalyticsComponent() {
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [analyticsData, setAnalyticsData] = useState({
     linkClicks: 0,
     shopClicks: 0,
@@ -51,7 +52,9 @@ export default function AnalyticsComponent() {
   useEffect(() => {
     const getCounts = async () => {
       try {
-        const res = await axios.get(`${VITE_BACK_URL}/api/getCounts`, { params: { email } });
+        const res = await axios.get(`${VITE_BACK_URL}/api/getCounts`, {
+          params: { email },
+        });
         if (res.status === 200) {
           setAnalyticsData(res.data);
         }
@@ -62,7 +65,10 @@ export default function AnalyticsComponent() {
 
     const fetchClickDetails = async () => {
       try {
-        const response = await axios.get(`${VITE_BACK_URL}/api/getClickDetails`, { params: { email } });
+        const response = await axios.get(
+          `${VITE_BACK_URL}/api/getClickDetails`,
+          { params: { email } }
+        );
         if (response.status === 200) {
           setClickDetails(response.data.clicks);
         }
@@ -75,6 +81,9 @@ export default function AnalyticsComponent() {
     fetchClickDetails();
   }, [email]);
 
+  // Function to detect mobile devices
+  const isMobile = () => window.innerWidth <= 456;
+
   const formatDate = (date) => {
     if (!date) return "";
     const options = { month: "short", day: "numeric" };
@@ -83,7 +92,9 @@ export default function AnalyticsComponent() {
     if (day === 1 || day === 21 || day === 31) suffix = "st";
     else if (day === 2 || day === 22) suffix = "nd";
     else if (day === 3 || day === 23) suffix = "rd";
-    return `${new Date(date).toLocaleString("en-US", { month: "short" })}${day}${suffix}`;
+    return `${new Date(date).toLocaleString("en-US", {
+      month: "short",
+    })}${day}${suffix}`;
   };
 
   const handleStartDateChange = (e) => setStartDate(e.target.value);
@@ -107,7 +118,20 @@ export default function AnalyticsComponent() {
   const filteredClickDetails = filterClickDetails();
 
   const aggregateClicksByMonth = () => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const clicksByMonth = months.map(() => 0);
     filteredClickDetails.forEach((click) => {
       const clickDate = new Date(click.date);
@@ -120,7 +144,20 @@ export default function AnalyticsComponent() {
   };
 
   const lineChartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         label: "Total Clicks (Links + Shops)",
@@ -141,15 +178,40 @@ export default function AnalyticsComponent() {
     scales: {
       y: {
         beginAtZero: true,
-        ticks: { callback: (value) => (value >= 1000 ? `${value / 1000}k` : value), stepSize: 1000, max: 3000 },
+        ticks: {
+          callback: (value) => (value >= 1000 ? `${value / 1000}k` : value),
+          stepSize: 1000,
+          max: 3000,
+          font: {
+            size: isMobile() ? 10 : 12,
+          },
+        },
         grid: { display: false },
         border: { display: false },
       },
-      x: { grid: { display: false }, border: { display: false } },
+      x: { 
+        grid: { display: false }, 
+        border: { display: false },
+        ticks: {
+          font: {
+            size: isMobile() ? 10 : 12,
+          },
+        },
+      },
     },
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.parsed.y}` } },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.parsed.y}`,
+        },
+        titleFont: {
+          size: isMobile() ? 12 : 14,
+        },
+        bodyFont: {
+          size: isMobile() ? 10 : 12,
+        },
+      },
     },
   };
 
@@ -159,7 +221,10 @@ export default function AnalyticsComponent() {
     filteredClickDetails.forEach((click) => {
       const platform = click.platform || "Others";
       const deviceIndex = devices.indexOf(platform);
-      if (deviceIndex !== -1 && (click.type === "link" || click.type === "shop")) {
+      if (
+        deviceIndex !== -1 &&
+        (click.type === "link" || click.type === "shop")
+      ) {
         clicksByDevice[deviceIndex] += 1;
       }
     });
@@ -172,10 +237,29 @@ export default function AnalyticsComponent() {
       {
         label: "Total Clicks (Links + Shops)",
         data: aggregateClicksByDevice(),
-        backgroundColor: ["#92FFC6", "#9BEBC1", "#165534", "#3EE58F", "#A1D4BA", "#21AF66"],
-        borderColor: ["#92FFC6", "#9BEBC1", "#165534", "#3EE58F", "#A1D4BA", "#21AF66"],
+        backgroundColor: [
+          "#92FFC6",
+          "#9BEBC1",
+          "#165534",
+          "#3EE58F",
+          "#A1D4BA",
+          "#21AF66",
+        ],
+        borderColor: [
+          "#92FFC6",
+          "#9BEBC1",
+          "#165534",
+          "#3EE58F",
+          "#A1D4BA",
+          "#21AF66",
+        ],
         borderWidth: 1,
-        borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+        borderRadius: {
+          topLeft: 20,
+          topRight: 20,
+          bottomLeft: 20,
+          bottomRight: 20,
+        },
       },
     ],
   };
@@ -186,15 +270,38 @@ export default function AnalyticsComponent() {
     scales: {
       y: {
         beginAtZero: true,
-        ticks: { callback: (value) => (value >= 1000 ? `${value / 1000}k` : value) },
+        ticks: {
+          callback: (value) => (value >= 1000 ? `${value / 1000}k` : value),
+          font: {
+            size: isMobile() ? 10 : 12,
+          },
+        },
         grid: { display: false },
         border: { display: false },
       },
-      x: { grid: { display: false }, border: { display: false } },
+      x: { 
+        grid: { display: false }, 
+        border: { display: false },
+        ticks: {
+          font: {
+            size: isMobile() ? 10 : 12,
+          },
+        },
+      },
     },
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.parsed.y}` } },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.parsed.y}`,
+        },
+        titleFont: {
+          size: isMobile() ? 12 : 14,
+        },
+        bodyFont: {
+          size: isMobile() ? 10 : 12,
+        },
+      },
     },
   };
 
@@ -210,7 +317,7 @@ export default function AnalyticsComponent() {
           analyticsData.otherClicks,
         ],
         backgroundColor: ["#165534", "#3EE58F", "#94E9B8", "#21AF66"],
-        borderColor: ["#165534", "#3EE58F", "#94E9B8", "#21AF66"],
+        borderColor: ["#165534", "#3EE58F", "#94E9B8", "##21AF66"],
         borderWidth: 1,
       },
     ],
@@ -221,7 +328,15 @@ export default function AnalyticsComponent() {
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } },
+      tooltip: {
+        callbacks: { label: (context) => `${context.label}: ${context.raw}` },
+        titleFont: {
+          size: isMobile() ? 12 : 14,
+        },
+        bodyFont: {
+          size: isMobile() ? 10 : 12,
+        },
+      },
     },
   };
 
@@ -243,8 +358,18 @@ export default function AnalyticsComponent() {
 
   const linkClicksChartData = () => {
     const { labels, data, uniqueUrls } = aggregateClicksByUrl();
-    const baseColors = ["#3EE58F", "#165534", "#94E9B8", "#A1D4BA", "#21AF66", "#92FFC6", "#9BEBC1"];
-    const colors = labels.map((_, index) => baseColors[index % baseColors.length]);
+    const baseColors = [
+      "#3EE58F",
+      "#165534",
+      "#94E9B8",
+      "#A1D4BA",
+      "#21AF66",
+      "#92FFC6",
+      "#9BEBC1",
+    ];
+    const colors = labels.map(
+      (_, index) => baseColors[index % baseColors.length]
+    );
 
     return {
       labels: labels.length ? labels : ["No Links"],
@@ -255,7 +380,12 @@ export default function AnalyticsComponent() {
           backgroundColor: data.length ? colors : ["#CCCCCC"],
           borderColor: data.length ? colors : ["#CCCCCC"],
           borderWidth: 1,
-          borderRadius: { topLeft: 20, topRight: 20, bottomLeft: 20, bottomRight: 20 },
+          borderRadius: {
+            topLeft: 20,
+            topRight: 20,
+            bottomLeft: 20,
+            bottomRight: 20,
+          },
         },
       ],
       uniqueUrls: uniqueUrls.length ? uniqueUrls : [],
@@ -268,11 +398,24 @@ export default function AnalyticsComponent() {
     scales: {
       y: {
         beginAtZero: true,
-        ticks: { callback: (value) => (value >= 1000 ? `${value / 1000}k` : value) },
+        ticks: {
+          callback: (value) => (value >= 1000 ? `${value / 1000}k` : value),
+          font: {
+            size: isMobile() ? 10 : 12,
+          },
+        },
         grid: { display: false },
         border: { display: false },
       },
-      x: { grid: { display: false }, border: { display: false } },
+      x: { 
+        grid: { display: false }, 
+        border: { display: false },
+        ticks: {
+          font: {
+            size: isMobile() ? 10 : 12,
+          },
+        },
+      },
     },
     plugins: {
       legend: { display: false },
@@ -286,39 +429,175 @@ export default function AnalyticsComponent() {
           },
         },
         enabled: (context) => context.chart.data.uniqueUrls.length > 0,
+        titleFont: {
+          size: isMobile() ? 12 : 14,
+        },
+        bodyFont: {
+          size: isMobile() ? 10 : 12,
+        },
       },
     },
   };
 
   return (
     <div className={styles["container"]}>
-      <div className={styles["overview"]}>
-        <p>Overview</p>
-        <div className={styles["calender-div"]}>
-          <label htmlFor="start-date" className={styles["date-display"]}>
-            <img src={calender1} alt="Start date" />
-            <span>{dateRangeText}</span>
-            <img src={calender2} alt="End date" />
-          </label>
-          <div className={styles["date-inputs"]}>
-            <input type="date" id="start-date" value={startDate || ""} onChange={handleStartDateChange} className={styles["date-picker"]} />
-            <input type="date" id="end-date" value={endDate || ""} onChange={handleEndDateChange} min={startDate} className={styles["date-picker"]} />
+      {/* Calendar at the top */}
+      <div style={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px 20px",
+        boxSizing: "border-box",
+        position: "sticky",
+        top: "0",
+        backgroundColor: "white",
+        zIndex: "1000",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+        columnGap:"5%"
+      }}>
+        <h3>Overview</h3>
+        <div style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "75%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems:"center",
+        }}>
+          <div 
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+              padding: "10px 15px",
+              backgroundColor: "white",
+              borderRadius: "10px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              cursor: "pointer",
+              width: "100%"
+            }}
+            onClick={() => setShowDatePicker(!showDatePicker)}
+          >
+            <img src={calender1} alt="Start date" style={{ width: "20px", height: "20px" }} />
+            <span style={{ color: "#676767", fontSize: "14px", fontWeight: "500" }}>
+              {dateRangeText}
+            </span>
+            <img src={calender2} alt="End date" style={{ width: "20px", height: "20px" }} />
           </div>
+          
+          {showDatePicker && (
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              right: "0",
+              backgroundColor: "white",
+              padding: "15px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+              zIndex: "1001",
+              marginTop: "5px",
+              width: "300px"
+            }}>
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px"
+              }}>
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px"
+                }}>
+                  <label htmlFor="start-date" style={{
+                    fontSize: "12px",
+                    color: "#666",
+                    fontWeight: "500"
+                  }}>From:</label>
+                  <input
+                    type="date"
+                    id="start-date"
+                    value={startDate || ""}
+                    onChange={handleStartDateChange}
+                    style={{
+                      padding: "8px",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      width: "100%",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                </div>
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px"
+                }}>
+                  <label htmlFor="end-date" style={{
+                    fontSize: "12px",
+                    color: "##666",
+                    fontWeight: "500"
+                  }}>To:</label>
+                  <input
+                    type="date"
+                    id="end-date"
+                    value={endDate || ""}
+                    onChange={handleEndDateChange}
+                    min={startDate}
+                    style={{
+                      padding: "8px",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      width: "100%",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                </div>
+              </div>
+              <button 
+                style={{
+                  marginTop: "10px",
+                  padding: "8px 16px",
+                  backgroundColor: "#000",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  width: "100%",
+                  fontWeight: "500"
+                }}
+                onClick={() => setShowDatePicker(false)}
+              >
+                Apply
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      <div className={styles["overview"]}>
+        <p>Overview</p>
+      </div>
+      
       <div className={styles["analytics-content"]}>
         <div className={styles["parent1"]}>
           <div className={styles["link"]}>
             <p>Clicks on Links</p>
-            <p style={{ fontWeight: "bold", fontSize: "2em" }}>{analyticsData.linkClicks}</p>
+            <p style={{ fontWeight: "bold", fontSize: "2em" }}>
+              {analyticsData.linkClicks}
+            </p>
           </div>
           <div className={styles["shop"]}>
             <p>Clicks on Shops</p>
-            <p style={{ fontWeight: "bold", fontSize: "2em" }}>{analyticsData.shopClicks}</p>
+            <p style={{ fontWeight: "bold", fontSize: "2em" }}>
+              {analyticsData.shopClicks}
+            </p>
           </div>
           <div className={styles["cta"]}>
             <p>CTA</p>
-            <p style={{ fontWeight: "bold", fontSize: "2em" }}>{analyticsData.getConnectedClicks}</p>
+            <p style={{ fontWeight: "bold", fontSize: "2em" }}>
+              {analyticsData.getConnectedClicks}
+            </p>
           </div>
         </div>
 
@@ -326,32 +605,48 @@ export default function AnalyticsComponent() {
           <Line data={lineChartData} options={lineChartOptions} />
         </div>
 
-        <div className={styles["parent2"]}>
-          <div className={styles["trafic-by-device"]}>
-            <h4>Traffic By Device</h4>
-            <Bar data={barChartData} options={barChartOptions} />
-          </div>
-          <div className={styles["sites"]}>
-            <h4>Sites</h4>
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              <div style={{ width: "150px", height: "150px" }}>
-                <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
-              </div>
-              <div>
-                <ul>
-                  <li className={styles["youtube"]}>YouTube: {analyticsData.youtubeClicks}</li>
-                  <li className={styles["facebook"]}>Facebook: {analyticsData.facebookClicks}</li>
-                  <li className={styles["instagram"]}>Instagram: {analyticsData.instagramClicks}</li>
-                  <li className={styles["others"]}>Others: {analyticsData.otherClicks}</li>
-                </ul>
-              </div>
+        {/* Traffic By Device as standalone component */}
+        <div className={styles["traffic-by-device-standalone"]}>
+          <h3>Traffic By Device</h3>
+          <Bar data={barChartData} options={barChartOptions} />
+        </div>
+
+        {/* Sites as standalone component */}
+        <div className={styles["sites-standalone"]}>
+          <h3>Sites</h3>
+          <div className={styles["sites-content"]}>
+            <div className={styles["doughnut-chart"]}>
+              <Doughnut
+                data={doughnutChartData}
+                options={doughnutChartOptions}
+              />
+            </div>
+            <div className={styles["sites-list"]}>
+              <ul>
+                <li className={styles["youtube"]}>
+                  YouTube: {analyticsData.youtubeClicks}
+                </li>
+                <li className={styles["facebook"]}>
+                  Facebook: {analyticsData.facebookClicks}
+                </li>
+                <li className={styles["instagram"]}>
+                  Instagram: {analyticsData.instagramClicks}
+                </li>
+                <li className={styles["others"]}>
+                  Others: {analyticsData.otherClicks}
+                </li>
+              </ul>
             </div>
           </div>
         </div>
+
         <div className={styles["traffic-by-links"]}>
           <h4>Traffic by Links</h4>
           <div style={{ height: "300px" }}>
-            <Bar data={linkClicksChartData()} options={linkClicksChartOptions} />
+            <Bar
+              data={linkClicksChartData()}
+              options={linkClicksChartOptions}
+            />
           </div>
         </div>
       </div>

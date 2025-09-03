@@ -4,7 +4,7 @@
     border-radius: 25px;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 1%;
+    margin-top: 2%;
     padding: 3%;
     height: 80%;
     display: flex;
@@ -72,14 +72,15 @@
 .settings-container button:hover {
   background-color: #218838;
 }
+
 @media (max-width: 456px) {
     .settings-container{
-        width: 95vw;
+        width: 100%;
         height: 77vh;
         border-radius: 25px;
         background-color: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-top: 1%;
+        margin-top: 5%;
         padding: 3%;
         display: flex;
         flex-direction: column;

@@ -2,18 +2,25 @@ import React, { useState } from "react";
 import share1 from "../assets/share1.png";
 import phone from "../assets/phone.png";
 import styles from "../components/Phone.module.css"; // Import the CSS module
-import youtube from "../assets/youtube.png";
-import instagram from "../assets/instagram.png";
-import facebook from "../assets/facebook.png";
-import twitter from "../assets/twitter.png";
 import fire from "../assets/fire.png";
 import special1 from "../assets/special1.png";
 import special2 from "../assets/special2.png";
 import avater from "../assets/avater.png";
 import "../components/Font.css";
 import shop from "../assets/pngwing.com (1).png"; // Default shop image
-import linkpng from "../assets/pngwing.com (2).png";
 import toast from "react-hot-toast";
+
+// ✅ Import react-icons
+import {
+  FaFacebook,
+  FaInstagram,
+  FaTwitter,
+  FaYoutube,
+  FaWhatsapp,
+  FaGithub,
+  FaLinkedin,
+  FaLink,
+} from "react-icons/fa";
 
 export default function Phone({
   selectedColor,
@@ -32,19 +39,26 @@ export default function Phone({
   const [isLink, setIsLink] = useState(true); // State to manage Link/Shop view
   const userID = localStorage.getItem("userID");
 
-  // Function to get the correct icon based on the selected app
+  // ✅ Function to get the correct icon based on the selected app
   const getIcon = (app) => {
-    switch (app) {
+    switch (app?.toLowerCase()) {
       case "youtube":
-        return youtube;
+        return <FaYoutube size={45} color="red" />;
       case "instagram":
-        return instagram;
+        return <FaInstagram size={45} color="#E1306C" />;
       case "facebook":
-        return facebook;
+        return <FaFacebook size={45} color="#1877F2" />;
       case "twitter":
-        return twitter;
+      case "x":
+        return <FaTwitter size={45} color="#1DA1F2" />;
+      case "whatsapp":
+        return <FaWhatsapp size={45} color="#25D366" />;
+      case "github":
+        return <FaGithub size={45} color="black" />;
+      case "linkedin":
+        return <FaLinkedin size={45} color="#0077B5" />;
       default:
-        return linkpng; // Default icon if no app is specified
+        return <FaLink size={45} color="#555" />; // Default fallback icon
     }
   };
 
@@ -148,9 +162,7 @@ export default function Phone({
       case "air-black":
         return { background: "#212529", borderRadius: "8px" };
       case "mineral-blue":
-        return { background: "transparent", border: "2px solid #cacbc5", borderRadius: "35px" };
       case "mineral-green":
-        return { background: "transparent", border: "2px solid #cacbc5", borderRadius: "35px" };
       case "mineral-orange":
         return { background: "transparent", border: "2px solid #cacbc5", borderRadius: "35px" };
       default:
@@ -208,7 +220,7 @@ export default function Phone({
             backgroundColor: isLink ? "#28A263" : "#F3F3F1",
             color: isLink ? "white" : "#6C6C6C",
           }}
-          onClick={() => setIsLink(true)} // Set isLink to true when clicked
+          onClick={() => setIsLink(true)}
         >
           Link
         </button>
@@ -218,7 +230,7 @@ export default function Phone({
             backgroundColor: !isLink ? "#28A263" : "#F3F3F1",
             color: !isLink ? "white" : "#6C6C6C",
           }}
-          onClick={() => setIsLink(false)} // Set isLink to false when clicked
+          onClick={() => setIsLink(false)}
         >
           Shop
         </button>
@@ -227,7 +239,7 @@ export default function Phone({
       {/* Dynamic Layout Section */}
       <div
         className={`${getLayoutClass()} ${styles[getFontClass()]}`}
-        style={{ backgroundColor: getThemeStyle().backgroundColor }} // Apply theme bg color to container
+        style={{ backgroundColor: getThemeStyle().backgroundColor }}
       >
         {(isLink ? savedAddLinks : savedShopLinks).map((item, index) => (
           <a
@@ -245,8 +257,8 @@ export default function Phone({
             style={{
               textDecoration: "none",
               color: "inherit",
-              ...getInnerDivStyle(), // Apply inner div styles to the link-item-div
-              ...getCombinedStyles(), // Apply combined theme and button styles
+              ...getInnerDivStyle(),
+              ...getCombinedStyles(),
             }}
           >
             <div
@@ -258,10 +270,11 @@ export default function Phone({
                   : `${styles["icon-link-carousel"]} ${styles[getFontClass()]}`
               }
             >
-              <img
-                src={isLink ? getIcon(item.app) : item.image || shop} // Use default shop image if no image is provided
-                alt={isLink ? item.app : "Shop"}
-              />
+              {isLink ? (
+                getIcon(item.app) // ✅ React Icon
+              ) : (
+                <img src={item.image || shop} alt="Shop" /> // ✅ Shop fallback
+              )}
             </div>
             <div
               className={
@@ -273,7 +286,7 @@ export default function Phone({
               }
               style={{ color: buttonFontColor || "inherit" }}
             >
-             <p className={`${styles[getFontClass()]}`}>{item.title}</p>
+              <p className={`${styles[getFontClass()]}`}>{item.title}</p>
             </div>
           </a>
         ))}

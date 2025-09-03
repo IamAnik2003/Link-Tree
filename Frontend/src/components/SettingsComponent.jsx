@@ -3,7 +3,7 @@ import styles from "../components/Settings.module.css"; // Import the CSS module
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import useIsMobile from "./useIsMobile";
 export default function SettingsComponent() {
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function SettingsComponent() {
   const [newEmail, setNewEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+  const isMobile = useIsMobile();
 
   // State for validation errors
   const [errors, setErrors] = useState({});
@@ -90,7 +90,10 @@ export default function SettingsComponent() {
         toast.success("Please login again!");
       }
     } catch (error) {
-      console.error("Error:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
       toast.error("Failed to update the profile");
     }
 
@@ -117,7 +120,9 @@ export default function SettingsComponent() {
             onChange={(e) => setFirstName(e.target.value)}
             required
           />
-          {errors.firstname && <p className={styles["error"]}>{errors.firstname}</p>}
+          {errors.firstname && (
+            <p className={styles["error"]}>{errors.firstname}</p>
+          )}
 
           {/* Last Name */}
           <label htmlFor="lastname">Last Name</label>
@@ -128,7 +133,9 @@ export default function SettingsComponent() {
             onChange={(e) => setLastName(e.target.value)}
             required
           />
-          {errors.lastname && <p className={styles["error"]}>{errors.lastname}</p>}
+          {errors.lastname && (
+            <p className={styles["error"]}>{errors.lastname}</p>
+          )}
 
           {/* Email */}
           <label htmlFor="newEmail">Email</label>
@@ -139,7 +146,9 @@ export default function SettingsComponent() {
             onChange={(e) => setNewEmail(e.target.value)}
             required
           />
-          {errors.newEmail && <p className={styles["error"]}>{errors.newEmail}</p>}
+          {errors.newEmail && (
+            <p className={styles["error"]}>{errors.newEmail}</p>
+          )}
 
           {/* Password */}
           <label htmlFor="password">Password</label>
@@ -150,7 +159,9 @@ export default function SettingsComponent() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {errors.password && <p className={styles["error"]}>{errors.password}</p>}
+          {errors.password && (
+            <p className={styles["error"]}>{errors.password}</p>
+          )}
 
           {/* Confirm Password */}
           <label htmlFor="confirmpassword">Confirm Password</label>
@@ -166,7 +177,21 @@ export default function SettingsComponent() {
           )}
 
           {/* Submit Button */}
-          <button type="submit">
+          <button
+            type="submit"
+            style={
+              isMobile
+                ? {
+                    width: "150px",
+                    padding: "1%",
+                    height: "50px",
+                    position: "relative",
+                    top: "0dvh",
+                    right: "76dvw",
+                  }
+                : { width: "150px", padding: "1%" }
+            }
+          >
             <p>Save Changes</p>
           </button>
         </form>

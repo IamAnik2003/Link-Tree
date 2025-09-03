@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styles from "../components/LinkComponent.module.css"; // Import the CSS module
-import phone from "../assets/phone.png";
+import React, { useState, useEffect, useRef } from "react";
+import styles from "../components/LinkComponent.module.css";
 import avater from "../assets/avater.png";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -14,7 +13,6 @@ import preview1 from "../assets/preview.png";
 import cross2 from "../assets/cross2.png";
 import Phone from "./Phone";
 import useIsMobile from "./useIsMobile";
-
 
 export default function LinkComponent({
   selectedColor,
@@ -35,7 +33,10 @@ export default function LinkComponent({
 }) {
   const email = localStorage.getItem("email");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [tempColor, setTempColor] = useState("#ffffff");
+  // Initialize tempColor with the saved color from localStorage
+  const [tempColor, setTempColor] = useState(
+    localStorage.getItem("selectedColor") || "#ffffff"
+  );
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
   const selectedLayout = localStorage.getItem("selectedLayout");
   const selectedButtonStyle = localStorage.getItem("selectedButtonStyle");
@@ -45,22 +46,118 @@ export default function LinkComponent({
   const selectedFont = localStorage.getItem("selectedFont");
   const selectedFontColor = localStorage.getItem("selectedFontColor");
   const [preview, setPreview] = useState(false);
+  const [desktopPreview, setDesktopPreview] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const isMobile = useIsMobile();
   const [file, setFile] = useState();
-  const [tempProfileImage, setTempProfileImage] = useState(null); // ✅ keep modified version
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
+
+  // Sync tempColor with selectedColor when component mounts
+  useEffect(() => {
+    if (selectedColor) {
+      setTempColor(selectedColor);
+    }
+  }, [selectedColor]);
+
+  // Image cropping functionality
+  const handleImageSelect = (e) => {
+    if (e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      const imageUrl = URL.createObjectURL(selectedFile);
+      setOriginalImage(imageUrl);
+      setIsImageEditorOpen(true);
+      setFile(selectedFile);
+    }
+  };
+
+  const cropImage = () => {
+    if (!originalImage) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = function () {
+      // Set canvas size to 80x80 (target size)
+      canvas.width = 80;
+      canvas.height = 80;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate aspect ratios
+      const imgAspect = img.width / img.height;
+      const canvasAspect = canvas.width / canvas.height;
+
+      let renderableWidth, renderableHeight, xStart, yStart;
+
+      // If image is wider than canvas
+      if (imgAspect > canvasAspect) {
+        renderableHeight = img.height;
+        renderableWidth = img.height * canvasAspect;
+        xStart = (img.width - renderableWidth) / 2;
+        yStart = 0;
+      }
+      // If image is taller than canvas
+      else {
+        renderableWidth = img.width;
+        renderableHeight = img.width / canvasAspect;
+        xStart = 0;
+        yStart = (img.height - renderableHeight) / 2;
+      }
+
+      // Draw image on canvas (centered and cropped)
+      ctx.drawImage(
+        img,
+        xStart,
+        yStart,
+        renderableWidth,
+        renderableHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      // Get the cropped image as data URL
+      const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      setCroppedImage(croppedDataUrl);
+      setTempProfileImage(croppedDataUrl);
+    };
+
+    img.src = originalImage;
+  };
+
+  const saveCroppedImage = () => {
+    if (croppedImage) {
+      setTempProfileImage(croppedImage);
+      setIsImageEditorOpen(false);
+      setOriginalImage(null);
+      setCroppedImage(null);
+    }
+  };
+
+  const cancelCrop = () => {
+    setIsImageEditorOpen(false);
+    setOriginalImage(null);
+    setCroppedImage(null);
+    setFile(null);
+  };
 
   const handleSaveButton = async (e) => {
     e.preventDefault();
 
     try {
       // First API call: Save profile data
-      const profileResponse = await axios.post(`${VITE_BACK_URL}/api/profileSave`, {
-        bio,
-        username,
-        email,
-        selectedColor,
-      });
+      const profileResponse = await axios.post(
+        `${VITE_BACK_URL}/api/profileSave`,
+        {
+          bio,
+          username,
+          email,
+          selectedColor,
+        }
+      );
 
       if (profileResponse.status === 200) {
         localStorage.setItem("selectedColor", selectedColor);
@@ -70,15 +167,22 @@ export default function LinkComponent({
       }
 
       // Handle image upload if file exists
-      if (file) {
+      if (file && croppedImage) {
+        // Convert data URL to blob
+        const response = await fetch(croppedImage);
+        const blob = await response.blob();
+        const croppedFile = new File([blob], "profile.jpg", {
+          type: "image/jpeg",
+        });
+
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "Link_tree"); // Make sure this matches your Cloudinary preset
-        formData.append("cloud_name", "dkfgcsnd1"); // Replace with your actual cloud name
+        formData.append("file", croppedFile);
+        formData.append("upload_preset", "Link_tree");
+        formData.append("cloud_name", "dkfgcsnd1");
 
         try {
           const uploadResponse = await axios.post(
-            "https://api.cloudinary.com/v1_1/dkfgcsnd1/image/upload", // Replace dkfgcsnd1 with your cloud name
+            "https://api.cloudinary.com/v1_1/dkfgcsnd1/image/upload",
             formData,
             {
               headers: {
@@ -87,21 +191,23 @@ export default function LinkComponent({
             }
           );
 
-          const imageURL = uploadResponse.data.secure_url; // Get the uploaded image URL
+          const imageURL = uploadResponse.data.secure_url;
 
           // Update profile image state and localStorage
           setProfileImage(imageURL);
           localStorage.setItem("profileImage", imageURL);
 
           // Save the imageURL to the backend
-          const updateImageResponse = await axios.patch(`${VITE_BACK_URL}/api/updateProfileImage`, {
-            email,
-            imageURL,
-          });
+          const updateImageResponse = await axios.patch(
+            `${VITE_BACK_URL}/api/updateProfileImage`,
+            {
+              email,
+              imageURL,
+            }
+          );
 
           if (updateImageResponse.status === 200) {
             toast.success("Profile picture uploaded and saved successfully!");
-            setTempProfileImage(null); // Reset the temporary image after saving
           }
         } catch (uploadError) {
           console.error("Upload Error:", uploadError.message);
@@ -109,16 +215,19 @@ export default function LinkComponent({
         }
       }
     } catch (error) {
-      console.error("Error:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
       toast.error(error.response?.data?.message || "Failed to update profile");
     }
   };
 
   const handleAddSaveLink = (newLink) => {
     if (isLink) {
-      setSavedAddLinks([...savedAddLinks, newLink]); // Update state
+      setSavedAddLinks([...savedAddLinks, newLink]);
     } else {
-      setSavedShopLinks([...savedShopLinks, newLink]); // Update state
+      setSavedShopLinks([...savedShopLinks, newLink]);
     }
   };
 
@@ -128,16 +237,14 @@ export default function LinkComponent({
       let updatedShopLinks = [...savedShopLinks];
 
       if (isLink) {
-        updatedAddLinks.splice(index, 1); // Remove the link at the specified index
+        updatedAddLinks.splice(index, 1);
       } else {
-        updatedShopLinks.splice(index, 1); // Remove the shop at the specified index
+        updatedShopLinks.splice(index, 1);
       }
 
-      // Update state
       setSavedAddLinks(updatedAddLinks);
       setSavedShopLinks(updatedShopLinks);
 
-      // Save the updated links to the backend
       const response = await axios.patch(`${VITE_BACK_URL}/api/profileSave`, {
         savedAddLinks: updatedAddLinks,
         savedShopLinks: updatedShopLinks,
@@ -145,12 +252,20 @@ export default function LinkComponent({
       });
 
       if (response.status === 200) {
-        toast.success(`${isLink ? "Link" : "Shop"} removed and saved successfully!`);
+        toast.success(
+          `${isLink ? "Link" : "Shop"} removed and saved successfully!`
+        );
         localStorage.setItem("savedAddLinks", JSON.stringify(updatedAddLinks));
-        localStorage.setItem("savedShopLinks", JSON.stringify(updatedShopLinks));
+        localStorage.setItem(
+          "savedShopLinks",
+          JSON.stringify(updatedShopLinks)
+        );
       }
     } catch (error) {
-      console.error("Error:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
       toast.error(`Failed to remove ${isLink ? "link" : "shop"}`);
     }
   };
@@ -158,21 +273,19 @@ export default function LinkComponent({
   const handleOnchange = (e) => {
     if (e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      setFile(selectedFile); // Update file state
-      const tempImageURL = URL.createObjectURL(selectedFile); // Create a temporary URL
-      setTempProfileImage(tempImageURL); // Update temporary image state
+      setFile(selectedFile); // Update state
     }
   };
 
   const handleRemoveImage = async () => {
     try {
-      // Remove the profile image from the backend
-      const response = await axios.patch(`${VITE_BACK_URL}/api/removeProfileImage`, { email });
+      const response = await axios.patch(
+        `${VITE_BACK_URL}/api/removeProfileImage`,
+        { email }
+      );
 
       if (response.status === 200) {
-        // Update state and localStorage
         setProfileImage(null);
-        setTempProfileImage(null); // Reset the temporary image
         localStorage.removeItem("profileImage");
         toast.success("Profile image removed successfully!");
       }
@@ -188,14 +301,36 @@ export default function LinkComponent({
   const handleCircleColorSelection = (color) => {
     setTempColor(color);
     setSelectedColor(color);
+    setIsColorPickerVisible(false); // Close color picker after selection
   };
 
   const handleInputColorSelection = (e) => {
-    setTempColor(e.target.value);
-    setSelectedColor(e.target.value);
+    const color = e.target.value;
+    setTempColor(color);
+    setSelectedColor(color);
+    setIsColorPickerVisible(false); // Close color picker after selection
   };
 
-  const toggleColorPicker = () => setIsColorPickerVisible(!isColorPickerVisible);
+  const toggleColorPicker = () =>
+    setIsColorPickerVisible(!isColorPickerVisible);
+
+  const toggleDesktopPreview = () => {
+    setDesktopPreview(!desktopPreview);
+  };
+
+  const toggleMobilePreview = () => {
+    if (preview) {
+      // Closing animation
+      setIsAnimating(true);
+      setTimeout(() => {
+        setPreview(false);
+        setIsAnimating(false);
+      }, 300);
+    } else {
+      // Opening
+      setPreview(true);
+    }
+  };
 
   return (
     <>
@@ -207,7 +342,7 @@ export default function LinkComponent({
             savedAddLinks={savedAddLinks}
             savedShopLinks={savedShopLinks}
             isLink={isLink}
-            profileImage={tempProfileImage || profileImage} // Use temporary image if available
+            profileImage={profileImage}
             selectedLayout={selectedLayout}
             selectedButtonStyle={selectedButtonStyle}
             buttonColor={buttonColor}
@@ -225,7 +360,7 @@ export default function LinkComponent({
             savedAddLinks={savedAddLinks}
             savedShopLinks={savedShopLinks}
             isLink={isLink}
-            profileImage={tempProfileImage || profileImage} // Use temporary image if available
+            profileImage={profileImage}
             selectedLayout={selectedLayout}
             selectedButtonStyle={selectedButtonStyle}
             buttonColor={buttonColor}
@@ -240,61 +375,74 @@ export default function LinkComponent({
         <div className={styles["link-content"]}>
           {isMobile && (
             <div
-              onClick={() => setPreview(true)}
-              style={{
-                position: "absolute",
-                width: "23%",
-                height: "6%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                top: "75%",
-                left: "40%",
-                zIndex: "1000",
-              }}
-              className={styles["preview"]}
+              onClick={toggleMobilePreview}
+              className={styles["mobile-preview-btn"]}
             >
-              <img style={{ width: "100%", height: "100%" }} src={preview1} alt="preview" />
+              <img src={preview1} alt="preview" />
             </div>
+          )}
+
+          {!isMobile && (
+            <button
+              className={styles["desktop-preview-btn"]}
+              onClick={toggleDesktopPreview}
+            >
+              <FaEye /> Preview
+            </button>
           )}
 
           {isMobile && preview && (
             <div
-              onClick={() => setPreview(false)}
-              style={{
-                position: "absolute",
-                width: "20%",
-                height: "10%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                top: "75%",
-                left: "40%",
-                zIndex: "1001",
-              }}
-              className={styles["preview"]}
+              onClick={toggleMobilePreview}
+              className={styles["mobile-close-preview-btn"]}
             >
-              <img style={{ width: "100%", height: "100%" }} src={cross2} alt="preview" />
+              <img src={cross2} alt="close preview" />
             </div>
           )}
 
-          <h3>Profile</h3>
+          <h3 style={{ alignSelf: "flex-start" }}>Profile</h3>
           <div className={styles["profile-container"]}>
+            <div
+              style={{
+                width: "60%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              
+              }}
+            >
+              <div className={styles["profile-pic"]}>
+                <img
+                  src={tempProfileImage || profileImage || avater}
+                  alt="Profile"
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            </div>
+
             <label htmlFor="profile-image" className={styles["pick-image"]}>
               Pick an image
+              <input
+                type="file"
+                onChange={handleImageSelect}
+                id="profile-image"
+                style={{ display: "none" }}
+                accept="image/*"
+              />
             </label>
-            <input
-              type="file"
-              onChange={handleOnchange}
-              id="profile-image"
-              style={{ display: "none" }}
-              accept="image/*"
-            />
-            <button onClick={handleRemoveImage} className={styles["remove-image"]}>
+            <button
+              onClick={handleRemoveImage}
+              className={styles["remove-image"]}
+            >
               Remove
             </button>
             <div className={styles["profile-pic"]}>
-              <img src={tempProfileImage || profileImage || avater} alt="Profile" />
+              <img src={profileImage || avater} alt="Profile" />
             </div>
             <div className={styles["profile-title"]}>
               <p>Profile title</p>
@@ -320,17 +468,73 @@ export default function LinkComponent({
             </div>
           </div>
 
+          {/* Image Editor Modal */}
+          {isImageEditorOpen && (
+            <div className={styles["image-editor-modal"]}>
+              <div className={styles["image-editor-content"]}>
+                <h3>Crop Your Profile Image</h3>
+                <p>Image will be cropped to 80x80 pixels</p>
+
+                <div className={styles["image-preview"]}>
+                  {originalImage && (
+                    <img
+                      src={originalImage}
+                      alt="Original"
+                      style={{ maxWidth: "100%", maxHeight: "300px" }}
+                    />
+                  )}
+                </div>
+
+                <canvas ref={canvasRef} style={{ display: "none" }} />
+
+                <div className={styles["editor-buttons"]}>
+                  <button onClick={cropImage} className={styles["crop-btn"]}>
+                    Crop Image
+                  </button>
+                  <button
+                    onClick={saveCroppedImage}
+                    className={styles["save-crop-btn"]}
+                  >
+                    Save Cropped Image
+                  </button>
+                  <button onClick={cancelCrop} className={styles["cancel-btn"]}>
+                    Cancel
+                  </button>
+                </div>
+
+                {croppedImage && (
+                  <div className={styles["cropped-preview"]}>
+                    <h4>Cropped Preview (80x80px):</h4>
+                    <img
+                      src={croppedImage}
+                      alt="Cropped"
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className={styles["addlink-container"]}>
             <div className={styles["add-shop-add-link"]}>
               <div
-                className={`${isLink ? styles["addlinkbtn"] : styles["addshopbtn"]}`}
+                className={`${
+                  isLink ? styles["addlinkbtn"] : styles["addshopbtn"]
+                }`}
                 onClick={() => setIsLink(true)}
               >
                 <img src={shop} alt="" />
                 <p>Add Link</p>
               </div>
               <div
-                className={`${!isLink ? styles["addlinkbtn"] : styles["addshopbtn"]}`}
+                className={`${
+                  !isLink ? styles["addlinkbtn"] : styles["addshopbtn"]
+                }`}
                 onClick={() => setIsLink(false)}
               >
                 <img src={shop} alt="" />
@@ -359,7 +563,10 @@ export default function LinkComponent({
                   </button>
                   <div className={styles["click"]}>
                     {!isLink && (
-                      <label className={styles["gallery-icon"]} htmlFor="shop-pic">
+                      <label
+                        className={styles["gallery-icon"]}
+                        htmlFor="shop-pic"
+                      >
                         <img src={gallaryicon} alt="Drag" />
                         <input
                           type="file"
@@ -393,19 +600,27 @@ export default function LinkComponent({
             />
           )}
 
-          <h3>Banner</h3>
+          <h3 style={{ alignSelf: "flex-start" }}>Banner</h3>
           <div className={styles["banner-container"]}>
-            <div className={styles["banner"]} style={{ backgroundColor: selectedColor }}>
+            <div
+              className={styles["banner"]}
+              style={{ backgroundColor: selectedColor }}
+            >
               <div className={styles["profile-on-banner"]}>
-                <img src={tempProfileImage || profileImage || avater} alt="Profile" />
+                <img src={profileImage || avater} alt="Profile" />
               </div>
               <h3>@{username}</h3>
               <p>
-                <img className={styles["fire-img"]} src={fire} alt="" />/{username}
+                <img className={styles["fire-img"]} src={fire} alt="" />/
+                {username}
               </p>
             </div>
+
+            <p style={{ fontSize: "1em", width: "100%", height: "7%" }}>
+              Custom Background Color
+            </p>
+
             <div className={styles["color-div"]}>
-              <p style={{ fontSize: "0.8em" }}>Custom Background Color</p>
               <div className={styles["colors"]}>
                 <div
                   className={`${styles["color-circle"]} ${styles["color-pic1"]}`}
@@ -428,6 +643,7 @@ export default function LinkComponent({
                 <input
                   type="color"
                   id="color-input"
+                  value={tempColor}
                   onChange={handleInputColorSelection}
                   style={{ display: isColorPickerVisible ? "block" : "none" }}
                 />

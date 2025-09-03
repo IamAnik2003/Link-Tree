@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import styles from "../components/Appearence.module.css";
 import Phone from "./Phone";
-import useIsMobile from "../components/useIsMobile"
-import stack from "../assets/stack.png";
-import grid from "../assets/grid.png";
-import carousel from "../assets/carousel.png";
+import useIsMobile from "../components/useIsMobile";
+import { FaLayerGroup, FaTh, FaScroll, FaEye, FaTimes } from "react-icons/fa";
 import special1 from "../assets/special1.png";
 import special2 from "../assets/special2.png";
 import preview1 from "../assets/preview.png";
@@ -19,19 +17,35 @@ export default function AppearanceComponent({
   savedShopLinks,
   isLink,
   profileImage,
-  VITE_URL
+  VITE_URL,
 }) {
-  const [selectedLayout, setSelectedLayout] = useState(localStorage.getItem("selectedLayout"));
-  const [selectedButtonStyle, setSelectedButtonStyle] = useState(localStorage.getItem("selectedButtonStyle"));
-  const [buttonColor, setButtonColor] = useState(localStorage.getItem("buttonColor")||"#C9C9C9");
-  const [buttonFontColor, setButtonFontColor] = useState(localStorage.getItem("buttonFontColor"));
-  const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem("selectedTheme"));
-  const [selectedFont, setSelectedFont] = useState(localStorage.getItem("selectedFont"));
-  const [selectedFontColor, setSelectedFontColor] = useState(localStorage.getItem("selectedFontColor"));
+  const [selectedLayout, setSelectedLayout] = useState(
+    localStorage.getItem("selectedLayout")
+  );
+  const [selectedButtonStyle, setSelectedButtonStyle] = useState(
+    localStorage.getItem("selectedButtonStyle")
+  );
+  const [buttonColor, setButtonColor] = useState(
+    localStorage.getItem("buttonColor") || "#C9C9C9"
+  );
+  const [buttonFontColor, setButtonFontColor] = useState(
+    localStorage.getItem("buttonFontColor") || "#000000"
+  );
+  const [selectedTheme, setSelectedTheme] = useState(
+    localStorage.getItem("selectedTheme")
+  );
+  const [selectedFont, setSelectedFont] = useState(
+    localStorage.getItem("selectedFont") || "Poppins"
+  );
+  const [selectedFontColor, setSelectedFontColor] = useState(
+    localStorage.getItem("selectedFontColor") || "#000000"
+  );
   const [isFontDialogOpen, setIsFontDialogOpen] = useState(false);
   const [preview, setPreview] = useState(false);
-  const isMobile= useIsMobile();
-  const email =localStorage.getItem("email");
+  const [desktopPreview, setDesktopPreview] = useState(false);
+  const [hoveredLayout, setHoveredLayout] = useState(null);
+  const isMobile = useIsMobile();
+  const email = localStorage.getItem("email");
   const VITE_BACK_URL = import.meta.env.VITE_BACK_URL;
 
   const handleLayoutSelection = (layout) => {
@@ -64,18 +78,21 @@ export default function AppearanceComponent({
   };
 
   const handleSaveButton = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const response = await axios.post(`${VITE_BACK_URL}/api/saveappsettings`, {
-        email,
-        selectedLayout,
-        selectedButtonStyle,
-        buttonColor,
-        buttonFontColor,
-        selectedTheme,
-        selectedFont,
-        selectedFontColor,
-      });
+      const response = await axios.post(
+        `${VITE_BACK_URL}/api/saveappsettings`,
+        {
+          email,
+          selectedLayout,
+          selectedButtonStyle,
+          buttonColor,
+          buttonFontColor,
+          selectedTheme,
+          selectedFont,
+          selectedFontColor,
+        }
+      );
       if (response.status === 200) {
         toast.success("Settings saved successfully!");
         localStorage.setItem("selectedLayout", selectedLayout);
@@ -95,6 +112,10 @@ export default function AppearanceComponent({
     }
   };
 
+  const toggleDesktopPreview = () => {
+    setDesktopPreview(!desktopPreview);
+  };
+
   const FontDialog = ({ isOpen, onClose, onSelectFont }) => {
     const fonts = ["Poppins", "Roboto", "Open Sans", "Lato", "Montserrat"];
 
@@ -104,7 +125,7 @@ export default function AppearanceComponent({
       <div className={styles["font-dialog"]} onClick={onClose}>
         <div
           className={styles["font-dialog-content"]}
-          onClick={(e) => e.stopPropagation()} // Prevent clicks inside the dialog from closing it
+          onClick={(e) => e.stopPropagation()}
         >
           <h3>Select a Font</h3>
           {fonts.map((font, index) => (
@@ -121,25 +142,44 @@ export default function AppearanceComponent({
       </div>
     );
   };
+
   return (
     <>
       <div className={styles["appearence-container"]}>
-        {!isMobile&&(<Phone
-          selectedColor={selectedColor}
-          username={username}
-          savedAddLinks={savedAddLinks}
-          savedShopLinks={savedShopLinks}
-          isLink={isLink}
-          selectedLayout={selectedLayout}
-          selectedButtonStyle={selectedButtonStyle}
-          buttonColor={buttonColor}
-          buttonFontColor={buttonFontColor}
-          selectedTheme={selectedTheme}
-          profileImage={profileImage}
-          selectedFont={selectedFont}
-          VITE_URL={VITE_URL}
-        />)}
-         {preview&&isMobile&&(<Phone
+        {preview && isMobile && (
+          <Phone
+            selectedColor={selectedColor}
+            username={username}
+            savedAddLinks={savedAddLinks}
+            savedShopLinks={savedShopLinks}
+            isLink={isLink}
+            profileImage={profileImage}
+            selectedLayout={selectedLayout}
+            selectedButtonStyle={selectedButtonStyle}
+            buttonColor={buttonColor}
+            buttonFontColor={buttonFontColor}
+            selectedTheme={selectedTheme}
+            selectedFont={selectedFont}
+            selectedFontColor={selectedFontColor}
+            VITE_URL={VITE_URL}
+          />
+        )}
+
+        {/* Desktop Preview Overlay */}
+        {desktopPreview && !isMobile && (
+          <div className={styles["desktop-preview-overlay"]}>
+            <div className={styles["desktop-preview-content"]}>
+              <div className={styles["desktop-preview-header"]}>
+                <h3>Preview</h3>
+                <button
+                  className={styles["close-preview-btn"]}
+                  onClick={toggleDesktopPreview}
+                >
+                  <FaTimes />
+                </button>
+              </div>
+              <div className={styles["desktop-preview-phone"]}>
+                <Phone
                   selectedColor={selectedColor}
                   username={username}
                   savedAddLinks={savedAddLinks}
@@ -154,47 +194,110 @@ export default function AppearanceComponent({
                   selectedFont={selectedFont}
                   selectedFontColor={selectedFontColor}
                   VITE_URL={VITE_URL}
-                />)}
-                
-         
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles["appearence-content"]}>
-           {isMobile&&(<div onClick={()=>{setPreview(true)}} style={{position:"absolute",width:"23%",height:"6%",display:"flex",alignItems:"center",justifyContent:"center",top:"75%",left:"40%",zIndex:"1000"}} className="preview">
-                      <img style={{width:"100%",height:"100%"}} src={preview1} alt="preview" />
-                    </div>)}
-                  
-                    {isMobile&&preview&&(<div onClick={()=>{setPreview(false)}} style={{position:"absolute",width:"20%",height:"10%",display:"flex",alignItems:"center",justifyContent:"center",top:"75%",left:"40%",zIndex:"1001"}} className="preview">
-                      <img style={{width:"100%",height:"100%"}} src={cross2} alt="preview" />
-                    </div>)}
-          <h3>Layout</h3>
+          {isMobile && (
+            <div
+              onClick={() => setPreview(true)}
+              style={{
+                position: "absolute",
+                width: "120px",
+                height: "50px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                top: "75dvh",
+                left: "35dvw",
+                zIndex: "1001",
+              }}
+              className="preview"
+            >
+              <img
+                style={{ width: "100%", height: "100%" }}
+                src={preview1}
+                alt="preview"
+              />
+            </div>
+          )}
+
+          {!isMobile && (
+            <button
+              className={styles["desktop-preview-btn"]}
+              onClick={toggleDesktopPreview}
+            >
+              <FaEye /> Preview
+            </button>
+          )}
+
+          {isMobile && preview && (
+            <div
+              onClick={() => setPreview(false)}
+              style={{
+                position: "absolute",
+                width: "60px",
+                height: "60px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                top: "75dvh",
+                left: "40dvw",
+                zIndex: "3000",
+              }}
+              className="preview"
+            >
+              <img
+                style={{ width: "100%", height: "100%" }}
+                src={cross2}
+                alt="preview"
+              />
+            </div>
+          )}
+
+          <h3 style={{ width: "100%", minHeight: "5%" }}>Layout</h3>
           <div className={styles["layout-container"]}>
             <div
               className={`${styles["stack"]} ${styles["layout"]} ${
                 selectedLayout === "stack" ? styles["selected-layout"] : ""
               }`}
               onClick={() => handleLayoutSelection("stack")}
+              onMouseEnter={() => setHoveredLayout("stack")}
+              onMouseLeave={() => setHoveredLayout(null)}
             >
-              <img src={stack} alt="Stack Layout" />
+              <FaLayerGroup size={24} />
+              {hoveredLayout === "stack" && (
+                <div className={styles["layout-tooltip"]}>Stack</div>
+              )}
             </div>
             <div
               className={`${styles["grid"]} ${styles["layout"]} ${
                 selectedLayout === "grid" ? styles["selected-layout"] : ""
               }`}
               onClick={() => handleLayoutSelection("grid")}
+              onMouseEnter={() => setHoveredLayout("grid")}
+              onMouseLeave={() => setHoveredLayout(null)}
             >
-              <img src={grid} alt="Grid Layout" />
+              <FaTh size={24} />
+              {hoveredLayout === "grid" && (
+                <div className={styles["layout-tooltip"]}>Grid</div>
+              )}
             </div>
             <div
               className={`${styles["carousel"]} ${styles["layout"]} ${
                 selectedLayout === "carousel" ? styles["selected-layout"] : ""
               }`}
               onClick={() => handleLayoutSelection("carousel")}
+              onMouseEnter={() => setHoveredLayout("carousel")}
+              onMouseLeave={() => setHoveredLayout(null)}
             >
-              <img src={carousel} alt="Carousel Layout" />
-            </div>
-            <div className={styles["names"]}>
-              <p className={styles["layout-names"]}>Stack</p>
-              <p className={styles["layout-names"]}>Grid</p>
-              <p className={styles["layout-names"]}>Carousel</p>
+              <FaScroll size={24} />
+              {hoveredLayout === "carousel" && (
+                <div className={styles["layout-tooltip"]}>Carousel</div>
+              )}
             </div>
           </div>
 
@@ -379,6 +482,8 @@ export default function AppearanceComponent({
                 onClick={() => handleButtonStyleSelection("special6")}
               ></div>
             </div>
+
+            {/* Button Color Settings - Only one section */}
             <p>Button color</p>
             <div className={styles["button-color-flex"]}>
               <div
@@ -394,10 +499,10 @@ export default function AppearanceComponent({
                   onChange={handleButtonColorChange}
                   style={{ display: "none" }}
                 />
-                <p>Button color</p>
-                <p style={{ color: "black" }}>{buttonColor}</p>
+                <p style={{ color: "black", width: "100%" }}>{buttonColor}</p>
               </label>
             </div>
+
             <p>Button font color</p>
             <div className={styles["button-color-flex"]}>
               <div
@@ -414,63 +519,13 @@ export default function AppearanceComponent({
                   name="pickbuttonfontcolor"
                   value={buttonFontColor}
                   onChange={handleButtonFontColorChange}
-                  className={styles["color-input"]}
-                />
-                <p>Button font color</p>
-                <p style={{ color: "black", marginRight: "8%" }}>
-                  {buttonFontColor}
-                </p>
-              </label>
-            </div>
-          </div>
-
-          {/* Fonts Section */}
-          <h3 className={styles["h2-set"]}>Fonts</h3>
-          <div className={styles["fonts-container"]}>
-            <p>Fonts</p>
-            <div className={styles["fonts-flex"]}>
-              <div className={styles["font-demo"]}>
-                <p style={{ fontFamily: selectedFont }}>Aa</p>
-              </div>
-              <label
-                htmlFor="pickfont"
-                className={styles["pickfont-div"]}
-                onClick={() => setIsFontDialogOpen(true)}
-              >
-                <p>{selectedFont}</p>
-              </label>
-            </div>
-            <p>Font color</p>
-            <div className={styles["font-color-flex"]}>
-              <div
-                className={styles["font-color-demo"]}
-                style={{ backgroundColor: selectedFontColor }}
-              ></div>
-              <label
-                className={styles["font-color-picker"]}
-                htmlFor="pickfontcolor"
-              >
-                <input
-                  type="color"
-                  id="pickfontcolor"
-                  name="pickfontcolor"
-                  value={selectedFontColor}
-                  onChange={handleFontColorChange}
                   style={{ display: "none" }}
                 />
-                <p>Color</p>
-                <p style={{ color: selectedFontColor }}>{selectedFontColor}</p>
+
+                <p style={{ color: "black" }}>{buttonFontColor}</p>
               </label>
             </div>
           </div>
-
-          {/* Font Dialog */}
-          <FontDialog
-            isOpen={isFontDialogOpen}
-            onClose={() => setIsFontDialogOpen(false)}
-            onSelectFont={handleFontSelection}
-          />
-
           {/* Themes Section */}
           <h3>Themes</h3>
           <div className={styles["themes-container"]}>
